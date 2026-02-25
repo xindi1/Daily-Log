@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <title>Master Daily Log</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a30;
+      --panel2:#101f3a;
+      --text:#e9f1ff;
+      --muted:#b8c6e6;
+      --line:rgba(255,255,255,.10);
+      --accent:#5ba8ff;
+      --good:#62d26f;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+      --pad: 14px;
+      --pad2: 18px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    [data-theme="light"]{
+      --bg:#f6f8ff;
+      --panel:#ffffff;
+      --panel2:#ffffff;
+      --text:#0c1430;
+      --muted:#49557a;
+      --line:rgba(10,20,48,.12);
+      --accent:#1e66ff;
+      --shadow: 0 14px 40px rgba(15,30,70,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(91,168,255,.20), transparent 60%),
+                  radial-gradient(900px 700px at 100% 0%, rgba(98,210,111,.12), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding: 18px 14px 80px;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: color-mix(in oklab, var(--bg) 78%, transparent);
+      border-bottom:1px solid var(--line);
+    }
+    .bar{
+      max-width:980px;
+      margin:0 auto;
+      padding: 14px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .title{
+      display:flex; align-items:center; gap:10px;
+      min-width: 0;
+    }
+    .logo{
+      width:34px; height:34px;
+      border-radius:10px;
+      background: linear-gradient(135deg, var(--accent), rgba(98,210,111,.75));
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+    }
+    h1{
+      font-size:16px; margin:0;
+      letter-spacing:.2px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .sub{
+      font-size:12px; color:var(--muted); margin-top:2px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .right{
+      display:flex; align-items:center; gap:10px;
+      flex:0 0 auto;
+    }
+    .pill{
+      border:1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 85%, transparent);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      display:flex; align-items:center; gap:8px;
+      font-size:12px;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background: var(--panel);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,.20);
+      transition: transform .05s ease;
+      font-size:13px;
+      line-height:1;
+    }
+    .btn:active{transform: translateY(1px);}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 60%, black));
+      border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+    }
+    .btn.ghost{
+      background: transparent;
+      box-shadow:none;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: color-mix(in oklab, var(--panel) 92%, transparent);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .head{
+      padding: 14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: color-mix(in oklab, var(--panel2) 88%, transparent);
+    }
+    .card .head .h{
+      font-size:14px; margin:0; letter-spacing:.2px;
+    }
+    .card .body{
+      padding: 14px 16px 16px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 170px 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items:start;
+    }
+    @media (max-width: 520px){
+      .row{grid-template-columns: 1fr}
+    }
+    label{
+      font-size:12px;
+      color:var(--muted);
+      padding-top: 10px;
+    }
+    input[type="date"], input[type="text"], input[type="number"], select, textarea{
+      width:100%;
+      background: color-mix(in oklab, var(--panel) 94%, transparent);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline:none;
+    }
+    textarea{min-height: 76px; resize: vertical; line-height:1.35}
+    .mini{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top:8px;
+    }
+    .chip{
+      border:1px solid var(--line);
+      background: transparent;
+      color:var(--muted);
+      padding:7px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .chip:hover{color:var(--text)}
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .muted{color:var(--muted)}
+    .status{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .list{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .item{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 12px;
+      background: color-mix(in oklab, var(--panel) 94%, transparent);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      cursor:pointer;
+    }
+    .item:hover{border-color: color-mix(in oklab, var(--accent) 35%, var(--line));}
+    .item .d{font-weight:600; font-size:13px}
+    .item .s{font-size:12px; color:var(--muted); margin-top:4px; max-width: 58ch}
+    .k{
+      border:1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      flex:0 0 auto;
+    }
+    .footerbar{
+      position:fixed; left:0; right:0; bottom:0;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      border-top:1px solid var(--line);
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      backdrop-filter: blur(10px);
+    }
+    .footerinner{
+      max-width:980px; margin:0 auto;
+      display:flex; gap:10px; justify-content:space-between; align-items:center;
+    }
+    .tabs{display:flex; gap:10px}
+    .tab{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      cursor:pointer;
+      font-size:13px;
+    }
+    .tab.active{
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+    }
+    .hidden{display:none !important;}
+    .danger{color:var(--bad)}
+    .ok{color:var(--good)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="title">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h1>Master Daily Log</h1>
+          <div class="sub">Offline PWA • IndexedDB • Import/Export CSV</div>
+        </div>
+      </div>
+      <div class="right">
+        <button class="btn ghost" id="themeBtn" title="Toggle theme">Theme</button>
+        <button class="btn ghost" id="installBtn" title="Install (if available)" style="display:none;">Install</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- Today / Editor -->
+      <section class="card" id="editorCard">
+        <div class="head">
+          <div>
+            <div class="h">Entry</div>
+            <div class="muted" style="font-size:12px; margin-top:2px;">Edit a date • Save • Export anytime</div>
+          </div>
+          <div class="pill">
+            <span id="saveDot" class="muted">●</span>
+            <span id="saveState">Idle</span>
+          </div>
+        </div>
+        <div class="body">
+          <div class="row">
+            <label for="date">Date</label>
+            <input id="date" type="date" />
+          </div>
+
+          <div class="row">
+            <label for="sleep">Sleep</label>
+            <textarea id="sleep" placeholder="Hours, quality, wake-ups, dreams..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="exercise">Exercise</label>
+            <textarea id="exercise" placeholder="Mode, duration, distance, intensity, notes..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="illness">Illness / Recovery</label>
+            <textarea id="illness" placeholder="Symptoms, recovery status, meds, soreness..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="weight">Weight</label>
+            <input id="weight" type="text" inputmode="decimal" placeholder="e.g., 182.4" />
+          </div>
+
+          <div class="row">
+            <label for="nutrition">Nutrition Summary</label>
+            <textarea id="nutrition" placeholder="Meals, macros, timing, hydration..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="supplements">Supplements</label>
+            <textarea id="supplements" placeholder="What + dosage (if desired)..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="work">Work Output</label>
+            <textarea id="work" placeholder="Deliverables, focus blocks, progress..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="revenue">Revenue Activity</label>
+            <textarea id="revenue" placeholder="Leads, offers, trading actions, invoices..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="system">System Upgrade</label>
+            <textarea id="system" placeholder="Tooling, automation, workflow improvements..."></textarea>
+          </div>
+
+          <div class="row">
+            <label for="insight">Strategic Insight</label>
+            <textarea id="insight" placeholder="What did you learn or notice today?"></textarea>
+          </div>
+
+          <div class="row">
+            <label for="emotion">Emotional Tone</label>
+            <textarea id="emotion" placeholder="Mood, triggers, regulation, social energy..."></textarea>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="saveBtn">Save</button>
+            <button class="btn" id="loadBtn">Load</button>
+            <button class="btn" id="dupBtn" title="Copy yesterday's entry into today's fields">Duplicate Yesterday</button>
+            <button class="btn" id="clearBtn">Clear</button>
+          </div>
+
+          <div class="status" id="statusLine">Tip: use <b>Duplicate Yesterday</b> for continuity, then edit only what changed.</div>
+        </div>
+      </section>
+
+      <!-- History / Tools -->
+      <section class="card" id="historyCard">
+        <div class="head">
+          <div>
+            <div class="h">History</div>
+            <div class="muted" style="font-size:12px; margin-top:2px;">Search • Tap to open</div>
+          </div>
+          <div class="pill">
+            <span class="muted">Entries:</span>
+            <b id="count">0</b>
+          </div>
+        </div>
+        <div class="body">
+          <div class="row" style="grid-template-columns: 1fr;">
+            <input id="search" type="text" placeholder="Search (e.g., swim, magnesium, revenue, anxious...)" />
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="exportBtn">Export CSV</button>
+            <label class="btn" for="importFile" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+              Import CSV
+              <input id="importFile" type="file" accept=".csv,text/csv" style="display:none;" />
+            </label>
+            <button class="btn" id="wipeBtn" title="Deletes ALL entries on this device">Wipe Data</button>
+          </div>
+
+          <div class="status muted" style="margin-top:8px;">
+            Import expects headers from your workbook (including <b>Ilness/Recovery</b> spelling) for perfect round-trip.
+          </div>
+
+          <div style="margin-top:12px;" class="list" id="list"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="footerbar">
+    <div class="footerinner">
+      <div class="tabs">
+        <button class="tab active" id="tabEditor">Editor</button>
+        <button class="tab" id="tabHistory">History</button>
+      </div>
+      <div class="muted" style="font-size:12px;" id="footNote">Offline-first • Stored on this device</div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ======== PWA install prompt ========
+  let deferredPrompt = null;
+  const installBtn = document.getElementById("installBtn");
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = "";
+  });
+  installBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = "none";
+  });
+
+  // ======== Theme ========
+  const themeBtn = document.getElementById("themeBtn");
+  const root = document.documentElement;
+  const THEME_KEY = "mdl_theme";
+  function setTheme(t){
+    document.body.dataset.theme = t;
+    localStorage.setItem(THEME_KEY, t);
+    themeBtn.textContent = (t === "light") ? "Dark" : "Light";
+  }
+  setTheme(localStorage.getItem(THEME_KEY) || "dark");
+  themeBtn.addEventListener("click", () => {
+    const next = (document.body.dataset.theme === "dark") ? "light" : "dark";
+    setTheme(next);
+  });
+
+  // ======== Tabs (mobile friendly) ========
+  const editorCard = document.getElementById("editorCard");
+  const historyCard = document.getElementById("historyCard");
+  const tabEditor = document.getElementById("tabEditor");
+  const tabHistory = document.getElementById("tabHistory");
+  function showTab(which){
+    const isEditor = which === "editor";
+    editorCard.classList.toggle("hidden", !isEditor);
+    historyCard.classList.toggle("hidden", isEditor);
+    tabEditor.classList.toggle("active", isEditor);
+    tabHistory.classList.toggle("active", !isEditor);
+  }
+  tabEditor.addEventListener("click", () => showTab("editor"));
+  tabHistory.addEventListener("click", () => showTab("history"));
+  // default: show both on wide screens, but hide history on small
+  function responsiveTabs(){
+    if (window.matchMedia("(max-width: 920px)").matches){
+      showTab("editor");
+    } else {
+      editorCard.classList.remove("hidden");
+      historyCard.classList.remove("hidden");
+      tabEditor.classList.add("active");
+      tabHistory.classList.remove("active");
+    }
+  }
+  window.addEventListener("resize", responsiveTabs);
+  responsiveTabs();
+
+  // ======== DB (IndexedDB) ========
+  const DB_NAME = "mdl_db";
+  const DB_VER = 1;
+  const STORE = "entries";
+
+  const HEADERS = [
+    "Date",
+    "Sleep",
+    "Exercise",
+    "Ilness/Recovery",
+    "Weight",
+    "Nutrition Summary",
+    "Supplements",
+    "Work Output",
+    "Revenue Activity",
+    "System Upgrade",
+    "Strategic Insight",
+    "Emotional Tone"
+  ];
+
+  function openDB(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(STORE)){
+          db.createObjectStore(STORE, { keyPath: "date" });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbPut(entry){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).put(entry);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async function dbGet(date){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readonly");
+      const req = tx.objectStore(STORE).get(date);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbGetAll(){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readonly");
+      const req = tx.objectStore(STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function dbDeleteAll(){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).clear();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // ======== UI wiring ========
+  const el = (id) => document.getElementById(id);
+
+  const fields = {
+    date: el("date"),
+    sleep: el("sleep"),
+    exercise: el("exercise"),
+    illness: el("illness"),
+    weight: el("weight"),
+    nutrition: el("nutrition"),
+    supplements: el("supplements"),
+    work: el("work"),
+    revenue: el("revenue"),
+    system: el("system"),
+    insight: el("insight"),
+    emotion: el("emotion"),
+  };
+
+  const saveBtn = el("saveBtn");
+  const loadBtn = el("loadBtn");
+  const dupBtn = el("dupBtn");
+  const clearBtn = el("clearBtn");
+  const exportBtn = el("exportBtn");
+  const importFile = el("importFile");
+  const wipeBtn = el("wipeBtn");
+  const search = el("search");
+  const list = el("list");
+  const count = el("count");
+  const saveDot = el("saveDot");
+  const saveState = el("saveState");
+  const statusLine = el("statusLine");
+  const footNote = el("footNote");
+
+  function todayISO(){
+    const d = new Date();
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off*60*1000);
+    return local.toISOString().slice(0,10);
+  }
+  fields.date.value = todayISO();
+
+  function setSaveState(state, kind="muted"){
+    saveState.textContent = state;
+    saveDot.className = kind;
+    saveDot.textContent = "●";
+  }
+
+  function sanitizeText(v){
+    return (v ?? "").toString();
+  }
+
+  function getEntryFromForm(){
+    const date = fields.date.value;
+    return {
+      date,
+      sleep: sanitizeText(fields.sleep.value),
+      exercise: sanitizeText(fields.exercise.value),
+      illness: sanitizeText(fields.illness.value),
+      weight: sanitizeText(fields.weight.value),
+      nutrition: sanitizeText(fields.nutrition.value),
+      supplements: sanitizeText(fields.supplements.value),
+      work: sanitizeText(fields.work.value),
+      revenue: sanitizeText(fields.revenue.value),
+      system: sanitizeText(fields.system.value),
+      insight: sanitizeText(fields.insight.value),
+      emotion: sanitizeText(fields.emotion.value),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function setFormFromEntry(e){
+    if (!e) return;
+    fields.date.value = e.date || fields.date.value;
+    fields.sleep.value = e.sleep || "";
+    fields.exercise.value = e.exercise || "";
+    fields.illness.value = e.illness || "";
+    fields.weight.value = e.weight || "";
+    fields.nutrition.value = e.nutrition || "";
+    fields.supplements.value = e.supplements || "";
+    fields.work.value = e.work || "";
+    fields.revenue.value = e.revenue || "";
+    fields.system.value = e.system || "";
+    fields.insight.value = e.insight || "";
+    fields.emotion.value = e.emotion || "";
+  }
+
+  function clearForm(keepDate=true){
+    const d = fields.date.value;
+    Object.keys(fields).forEach(k => {
+      if (k === "date") return;
+      fields[k].value = "";
+    });
+    if (keepDate) fields.date.value = d;
+  }
+
+  async function loadForDate(date){
+    const e = await dbGet(date);
+    if (e){
+      setFormFromEntry(e);
+      setSaveState("Loaded", "ok");
+      statusLine.textContent = "Loaded saved entry for " + date + ".";
+    } else {
+      clearForm(true);
+      setSaveState("No entry", "warn");
+      statusLine.textContent = "No saved entry for " + date + ". (You can start fresh and Save.)";
+    }
+  }
+
+  function previewText(e){
+    const parts = [];
+    if (e.exercise) parts.push("Exercise: " + e.exercise);
+    if (e.sleep) parts.push("Sleep: " + e.sleep);
+    if (e.nutrition) parts.push("Nutrition: " + e.nutrition);
+    if (e.revenue) parts.push("Revenue: " + e.revenue);
+    if (e.emotion) parts.push("Tone: " + e.emotion);
+    const joined = parts.join(" • ");
+    return joined.length > 140 ? joined.slice(0, 140) + "…" : joined;
+  }
+
+  function sortDatesDesc(a,b){
+    return (a.date < b.date) ? 1 : (a.date > b.date ? -1 : 0);
+  }
+
+  async function refreshList(){
+    const all = (await dbGetAll()).sort(sortDatesDesc);
+    const q = (search.value || "").trim().toLowerCase();
+
+    const filtered = !q ? all : all.filter(e => {
+      const hay = [
+        e.date, e.sleep, e.exercise, e.illness, e.weight, e.nutrition, e.supplements,
+        e.work, e.revenue, e.system, e.insight, e.emotion
+      ].join(" ").toLowerCase();
+      return hay.includes(q);
+    });
+
+    count.textContent = all.length.toString();
+    list.innerHTML = "";
+
+    if (filtered.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "muted";
+      empty.style.padding = "6px 2px";
+      empty.textContent = q ? "No matches." : "No entries yet. Save your first day.";
+      list.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach(e => {
+      const div = document.createElement("div");
+      div.className = "item";
+      const left = document.createElement("div");
+      const d = document.createElement("div");
+      d.className = "d";
+      d.textContent = e.date;
+      const s = document.createElement("div");
+      s.className = "s";
+      s.textContent = previewText(e);
+      left.appendChild(d); left.appendChild(s);
+
+      const tag = document.createElement("div");
+      tag.className = "k";
+      tag.textContent = e.weight ? ("Wt: " + e.weight) : "Open";
+
+      div.appendChild(left);
+      div.appendChild(tag);
+
+      div.addEventListener("click", async () => {
+        fields.date.value = e.date;
+        await loadForDate(e.date);
+        if (window.matchMedia("(max-width: 920px)").matches) showTab("editor");
+      });
+
+      list.appendChild(div);
+    });
+
+    footNote.textContent = "Offline-first • " + all.length + " entries on this device";
+  }
+
+  // ======== Actions ========
+  saveBtn.addEventListener("click", async () => {
+    const date = fields.date.value;
+    if (!date){
+      alert("Pick a date first.");
+      return;
+    }
+    setSaveState("Saving…", "warn");
+    try{
+      const entry = getEntryFromForm();
+      await dbPut(entry);
+      setSaveState("Saved", "ok");
+      statusLine.textContent = "Saved entry for " + date + ".";
+      await refreshList();
+    } catch (err){
+      console.error(err);
+      setSaveState("Save failed", "danger");
+      alert("Save failed. Try again.");
+    }
+  });
+
+  loadBtn.addEventListener("click", async () => {
+    const date = fields.date.value;
+    if (!date) return alert("Pick a date first.");
+    await loadForDate(date);
+  });
+
+  fields.date.addEventListener("change", async () => {
+    const date = fields.date.value;
+    if (date) await loadForDate(date);
+  });
+
+  clearBtn.addEventListener("click", () => {
+    if (confirm("Clear the form fields? (This does not delete saved entries.)")){
+      clearForm(true);
+      setSaveState("Cleared", "muted");
+      statusLine.textContent = "Cleared form fields (not saved).";
+    }
+  });
+
+  dupBtn.addEventListener("click", async () => {
+    const date = fields.date.value;
+    if (!date) return alert("Pick a date first.");
+    const d = new Date(date + "T12:00:00");
+    d.setDate(d.getDate() - 1);
+    const y = d.toISOString().slice(0,10);
+    const prev = await dbGet(y);
+    if (!prev) return alert("No entry found for yesterday (" + y + ").");
+    // Copy everything except date/updatedAt
+    fields.sleep.value = prev.sleep || "";
+    fields.exercise.value = prev.exercise || "";
+    fields.illness.value = prev.illness || "";
+    fields.weight.value = prev.weight || "";
+    fields.nutrition.value = prev.nutrition || "";
+    fields.supplements.value = prev.supplements || "";
+    fields.work.value = prev.work || "";
+    fields.revenue.value = prev.revenue || "";
+    fields.system.value = prev.system || "";
+    fields.insight.value = prev.insight || "";
+    fields.emotion.value = prev.emotion || "";
+    setSaveState("Copied", "ok");
+    statusLine.textContent = "Copied yesterday (" + y + "). Now edit and Save.";
+  });
+
+  search.addEventListener("input", refreshList);
+
+  // ======== CSV export/import ========
+  function csvEscape(val){
+    const s = (val ?? "").toString().replace(/\r\n/g, "\n").replace(/\r/g,"\n");
+    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  }
+
+  function entriesToCSV(entries){
+    const rows = [];
+    rows.push(HEADERS.join(","));
+    for (const e of entries){
+      const row = [
+        e.date || "",
+        e.sleep || "",
+        e.exercise || "",
+        e.illness || "",
+        e.weight || "",
+        e.nutrition || "",
+        e.supplements || "",
+        e.work || "",
+        e.revenue || "",
+        e.system || "",
+        e.insight || "",
+        e.emotion || ""
+      ].map(csvEscape).join(",");
+      rows.push(row);
+    }
+    return rows.join("\n");
+  }
+
+  function parseCSV(text){
+    // Minimal CSV parser that supports quoted fields and commas/newlines in quotes.
+    const rows = [];
+    let i = 0, field = "", row = [], inQuotes = false;
+
+    function pushField(){
+      row.push(field);
+      field = "";
+    }
+    function pushRow(){
+      rows.push(row);
+      row = [];
+    }
+
+    while (i < text.length){
+      const c = text[i];
+
+      if (inQuotes){
+        if (c === '"'){
+          if (text[i+1] === '"'){ field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        } else {
+          field += c; i++; continue;
+        }
+      } else {
+        if (c === '"'){ inQuotes = true; i++; continue; }
+        if (c === ","){ pushField(); i++; continue; }
+        if (c === "\n"){
+          pushField(); pushRow(); i++; continue;
+        }
+        if (c === "\r"){
+          // swallow \r (windows)
+          i++; continue;
+        }
+        field += c; i++; continue;
+      }
+    }
+    pushField(); pushRow();
+    // remove trailing empty row if file ends with newline
+    if (rows.length && rows[rows.length-1].length === 1 && rows[rows.length-1][0] === "") rows.pop();
+    return rows;
+  }
+
+  function normalizeHeader(h){
+    return (h || "").trim().toLowerCase();
+  }
+
+  function parseDateFlexible(v){
+    const s = (v ?? "").toString().trim();
+    if (!s) return "";
+    // Already ISO
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+    // MM/DD/YYYY or M/D/YYYY
+    const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (mdy){
+      const mm = mdy[1].padStart(2,"0");
+      const dd = mdy[2].padStart(2,"0");
+      return `${mdy[3]}-${mm}-${dd}`;
+    }
+
+    // Excel serial date?
+    if (/^\d+(\.\d+)?$/.test(s)){
+      const n = Number(s);
+      if (n > 20000 && n < 90000){
+        // Excel epoch (1899-12-30)
+        const epoch = new Date(Date.UTC(1899,11,30));
+        const d = new Date(epoch.getTime() + Math.round(n)*86400000);
+        return d.toISOString().slice(0,10);
+      }
+    }
+
+    // Fallback: Date.parse
+    const t = Date.parse(s);
+    if (!Number.isNaN(t)){
+      const d = new Date(t);
+      const off = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - off*60*1000);
+      return local.toISOString().slice(0,10);
+    }
+    return "";
+  }
+
+  exportBtn.addEventListener("click", async () => {
+    const all = (await dbGetAll()).sort((a,b)=> a.date.localeCompare(b.date));
+    const csv = entriesToCSV(all);
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `MASTER_DAILY_LOG_${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  importFile.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    const rows = parseCSV(text);
+
+    if (!rows.length) return alert("CSV appears empty.");
+    const headerRow = rows[0].map(h => h.trim());
+    const map = new Map();
+    headerRow.forEach((h, idx) => map.set(normalizeHeader(h), idx));
+
+    // Try best-effort mapping (handles your workbook spelling)
+    const idx = (name) => map.get(normalizeHeader(name));
+
+    const required = ["date"];
+    if (idx("Date") == null && idx("date") == null) {
+      alert("Could not find a Date column in this CSV.");
+      importFile.value = "";
+      return;
+    }
+
+    const toGet = (row, name, fallbackNames=[]) => {
+      let j = idx(name);
+      if (j == null){
+        for (const f of fallbackNames){
+          j = idx(f);
+          if (j != null) break;
+        }
+      }
+      return (j == null) ? "" : (row[j] ?? "");
+    };
+
+    const imported = [];
+    for (let r = 1; r < rows.length; r++){
+      const row = rows[r];
+      if (!row || row.every(c => (c ?? "").trim() === "")) continue;
+
+      const rawDate = toGet(row, "Date", ["date"]);
+      const date = parseDateFlexible(rawDate);
+      if (!date) continue;
+
+      imported.push({
+        date,
+        sleep: toGet(row, "Sleep"),
+        exercise: toGet(row, "Exercise"),
+        illness: toGet(row, "Ilness/Recovery", ["Illness/Recovery", "Illness / Recovery"]),
+        weight: toGet(row, "Weight"),
+        nutrition: toGet(row, "Nutrition Summary", ["Nutrition"]),
+        supplements: toGet(row, "Supplements"),
+        work: toGet(row, "Work Output", ["Work"]),
+        revenue: toGet(row, "Revenue Activity", ["Revenue"]),
+        system: toGet(row, "System Upgrade", ["System"]),
+        insight: toGet(row, "Strategic Insight", ["Insight"]),
+        emotion: toGet(row, "Emotional Tone", ["Emotion", "Mood"]),
+        updatedAt: new Date().toISOString()
+      });
+    }
+
+    if (!imported.length){
+      alert("No rows imported. (Check Date formatting.)");
+      importFile.value = "";
+      return;
+    }
+
+    const mode = confirm(
+      "Import " + imported.length + " rows.\n\nOK = Merge/Overwrite by date\nCancel = Abort"
+    );
+    if (!mode){
+      importFile.value = "";
+      return;
+    }
+
+    setSaveState("Importing…", "warn");
+    for (const entry of imported){
+      await dbPut(entry);
+    }
+    setSaveState("Imported", "ok");
+    await refreshList();
+    statusLine.textContent = "Imported " + imported.length + " rows (merged by date).";
+    importFile.value = "";
+  });
+
+  wipeBtn.addEventListener("click", async () => {
+    const ok = confirm("This deletes ALL entries stored on this device. Continue?");
+    if (!ok) return;
+    await dbDeleteAll();
+    clearForm(true);
+    setSaveState("Wiped", "danger");
+    await refreshList();
+    statusLine.textContent = "All local entries wiped.";
+  });
+
+  // Initial load
+  (async () => {
+    await loadForDate(fields.date.value);
+    await refreshList();
+  })();
+
+  // ======== Register service worker ========
+  if ("serviceWorker" in navigator){
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>
